@@ -30,6 +30,7 @@ services:
       - ./conf:/opt/sonarqube/conf
       - ./data:/opt/sonarqube/data
       - ./extensions:/opt/sonarqube/extensions
+      # - ./lib/extensions:/opt/sonarqube/lib/extensions
       - ./logs:/opt/sonarqube/logs
 
   sonarqube-2025-6-postgres:
