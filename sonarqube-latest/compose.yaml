@@ -1,8 +1,30 @@
 ---
 services:
+  sonarqube-latest-mcp:
+    container_name: sonarqube-latest-mcp
+    depends_on:
+      - sonarqube-latest
+    image: mcp/sonarqube:latest
+    restart: unless-stopped
+    environment:
+      SONARQUBE_HTTP_HOST: 0.0.0.0
+      SONARQUBE_HTTP_PORT: 8080
+      SONARQUBE_TOKEN: ${SONAR_TOKEN}
+      SONARQUBE_TRANSPORT: http
+      SONARQUBE_URL: http://sonarqube-latest:9000
+    networks:
+      - sonarqube-latest-backend
+    ports:
+      - 19999:8080
+
   sonarqube-latest:
     container_name: sonarqube-latest
-    image: sonarqube:2025.4.2-enterprise
+    depends_on:
+      - sonarqube-latest-postgres
+    image: sonarqube:2026.2.1-enterprise
+    environment:
+      - SONAR_JDBC_URL=jdbc:postgresql://sonarqube-latest-postgres/sonarqube?currentSchema=public
+      - SONAR_JDBC_USERNAME=sonar
     stop_grace_period: 3600s
     networks:
       - sonarqube-latest-backend
@@ -10,58 +32,57 @@ services:
       - ./conf:/opt/sonarqube/conf
       - ./data:/opt/sonarqube/data
       - ./extensions:/opt/sonarqube/extensions
+      # - ./lib/extensions:/opt/sonarqube/lib/extensions
       - ./logs:/opt/sonarqube/logs
+
+  sonarqube-latest-postgres:
+    container_name: sonarqube-latest-postgres
+    image: postgres:18
+    environment:
+      - POSTGRES_DB=sonarqube
+      - POSTGRES_HOST_AUTH_METHOD=trust
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_USER=sonar
+    networks:
+      - sonarqube-latest-backend
+    volumes:
+      - var-lib-postgresql-18-docker:/var/lib/postgresql/18/docker
 
   sonarqube-latest-nginx:
     container_name: sonarqube-latest-nginx
     depends_on:
       - sonarqube-latest
-    image: nginx:1.27
+    image: nginx:1.29
     networks:
       - sonarqube-latest-backend
       - sonarqube-latest-frontend
     ports:
-      - 9010:80
-      - 9011:443
+      - 19995:80
+      - 19996:81
+      - 19997:443
     volumes:
       - ./server.crt:/etc/nginx/ssl/certificate.crt
       - ./server.key:/etc/nginx/ssl/private.key
       - ./nginx.conf:/etc/nginx/nginx.conf
-  
-  sonarqube-latest-ngrok:
-    container_name: sonarqube-latest-ngrok
-    depends_on:
-      - sonarqube-latest
-    image: ngrok/ngrok:3
-    command:
-      - "start"
-      - "sonarqube"
-      - "--config"
-      - "/etc/ngrok.yml"
-    ports:
-      - 4040:4040
-    volumes:
-      - ./ngrok.yml:/etc/ngrok.yml
-    environment:
-      NGROK_AUTHTOKEN: ${NGROK_AUTHTOKEN}
 
-  sonarqube-latest-vmagent:
-    container_name: sonarqube-latest-vmagent
-    depends_on:
-      - sonarqube-latest
-    image: victoriametrics/vmagent:v1.93.15
-    networks:
-      - sonarqube-latest-backend
-    command:
-      - "--promscrape.config=/etc/prometheus/prometheus.yml"
-      - "--remoteWrite.url=http://host.docker.internal:8428/api/v1/write"
-    volumes:
-      - ./vmagent.yaml:/etc/prometheus/prometheus.yml
-      - vmagentdata:/vmagentdata
+  # sonarqube-latest-vmagent:
+  #   container_name: sonarqube-latest-vmagent
+  #   depends_on:
+  #     - sonarqube-latest
+  #   image: victoriametrics/vmagent:v1.93.15
+  #   networks:
+  #     - sonarqube-latest-backend
+  #   command:
+  #     - "--promscrape.config=/etc/prometheus/prometheus.yml"
+  #     - "--remoteWrite.url=http://host.docker.internal:8428/api/v1/write"
+  #   volumes:
+  #     - ./vmagent.yaml:/etc/prometheus/prometheus.yml
+  #     - vmagentdata:/vmagentdata
 
 networks:
   sonarqube-latest-backend:
   sonarqube-latest-frontend:
 
 volumes:
-  vmagentdata:
+  var-lib-postgresql-18-docker:
+  # vmagentdata:
