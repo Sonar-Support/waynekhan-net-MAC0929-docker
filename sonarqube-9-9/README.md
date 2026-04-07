@@ -1,4 +1,4 @@
-# sonarqube-9
+# sonarqube-9-9
 
 ```text
 export POSTGRES_PASSWORD=  # FIXME: Set a non-empty password, lest Postgres not work
@@ -7,7 +7,7 @@ export POSTGRES_PASSWORD=  # FIXME: Set a non-empty password, lest Postgres not 
 docker compose up
 
 # Auth as the "sonar" superuser
-docker exec -it sonarqube-9-postgres psql -U sonar -d sonarqube
+docker exec -it sonarqube-9-9-postgres psql -U sonar -d sonarqube
 ```
 
 ## References
