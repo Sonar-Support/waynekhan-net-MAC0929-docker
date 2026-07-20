@@ -2,3 +2,4 @@ data/*
 extensions/plugins/*.jar
 lib/extensions/*.jar
 logs/*.log
+
