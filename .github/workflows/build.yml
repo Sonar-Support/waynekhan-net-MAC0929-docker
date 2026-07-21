@@ -23,6 +23,9 @@ jobs:
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           SONAR_HOST_URL: ${{ vars.SONAR_HOST_URL }}
+          SONAR_ORGANIZATION: ${{ vars.SONAR_ORGANIZATION }}
         with:
           args: >
+            "-Dsonar.organization=${{ env.SONAR_ORGANIZATION }}"
+            "-Dsonar.projectKey=Sonar-Support_waynekhan-net-MAC0929-docker"
             "-Dsonar.verbose=${{ env.SONAR_VERBOSE }}"
