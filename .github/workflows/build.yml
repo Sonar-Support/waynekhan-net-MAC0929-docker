@@ -13,9 +13,10 @@ jobs:
     name: SonarQube
     runs-on: ubuntu-latest
     steps:
-      - if: ${{ contains(github.ref_name, 'feat') }}
-        run: |
-          echo 'hello'
+      - if: ${{ !contains(github.ref_name, 'feat') }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh run cancel "$GITHUB_RUN_ID"
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
