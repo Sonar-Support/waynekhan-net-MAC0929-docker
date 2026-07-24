@@ -6,12 +6,16 @@ on:
   push:
     branches:
       - main
+      - feat/github-ref-name
 
 jobs:
   sonarqube:
     name: SonarQube
     runs-on: ubuntu-latest
     steps:
+      - if: ${{ github.ref_name == 'feat/github-ref-name' }}
+        run: |
+          echo 'hello'
       - uses: actions/checkout@v6
         with:
           fetch-depth: 0
