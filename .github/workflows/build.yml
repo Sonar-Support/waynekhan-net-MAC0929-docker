@@ -13,7 +13,7 @@ jobs:
     name: SonarQube
     runs-on: ubuntu-latest
     steps:
-      - if: ${{ github.ref_name == 'feat/github-ref-name' }}
+      - if: ${{ contains(github.ref_name, 'feat') }}
         run: |
           echo 'hello'
       - uses: actions/checkout@v6
