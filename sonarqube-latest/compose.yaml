@@ -33,7 +33,6 @@ services:
       - LDAP_URL=ldap://sonarqube-latest-openldap:389
       - LDAP_BINDDN=cn=admin,dc=example,dc=org
       - LDAP_REALM=example.org
-      - LDAP_USER_BASE_DN=cn=employees,dc=example,dc=org
 
       # [LDAP] anchor mapping
 
